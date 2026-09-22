@@ -1,34 +1,65 @@
-from __future__ import print_function
+"""
+Gnome Sort Algorithm (A.K.A. Stupid Sort)
 
-def gnome_sort(unsorted):
+This algorithm iterates over a list comparing an element with the previous one.
+If order is not respected, it swaps element backward until order is respected with
+previous element.  It resumes the initial iteration from element new position.
+
+For doctests run following command:
+python3 -m doctest -v gnome_sort.py
+
+For manual testing run:
+python3 gnome_sort.py
+"""
+
+from typing import Protocol
+
+
+class Comparable(Protocol):
+    def __lt__(self, other: object, /) -> bool: ...
+
+
+def gnome_sort[T: Comparable](lst: list[T]) -> list[T]:
     """
-    Pure implementation of the gnome sort algorithm in Python.
+    Pure implementation of the gnome sort algorithm in Python
+
+    Take some mutable ordered collection with heterogeneous comparable items inside as
+    arguments, return the same collection ordered by ascending.
+
+    Examples:
+    >>> gnome_sort([0, 5, 3, 2, 2])
+    [0, 2, 2, 3, 5]
+
+    >>> gnome_sort([])
+    []
+
+    >>> gnome_sort([-2, -5, -45])
+    [-45, -5, -2]
+
+    >>> "".join(gnome_sort(list(set("Gnomes are stupid!"))))
+    ' !Gadeimnoprstu'
     """
-    if len(unsorted) <= 1:
-        return unsorted
-        
+    if len(lst) <= 1:
+        return lst
+
     i = 1
-    
-    while i < len(unsorted):
-        if unsorted[i-1] <= unsorted[i]:
+
+    while i < len(lst):
+        if not lst[i] < lst[i - 1]:
             i += 1
         else:
-            unsorted[i-1], unsorted[i] = unsorted[i], unsorted[i-1]
+            lst[i - 1], lst[i] = lst[i], lst[i - 1]
             i -= 1
-            if (i == 0):
+            if i == 0:
                 i = 1
-                
-if __name__ == '__main__':
-    import sys
 
-    # For python 2.x and 3.x compatibility: 3.x has not raw_input builtin
-    # otherwise 2.x's input builtin function is too "smart"
-    if sys.version_info.major < 3:
-        input_function = raw_input
-    else:
-        input_function = input
-    
-    user_input = input_function('Enter numbers separated by a comma:\n')
-    unsorted = [int(item) for item in user_input.split(',')]
-    gnome_sort(unsorted)
-    print(unsorted)
+    return lst
+
+
+if __name__ == "__main__":
+    import doctest
+
+    doctest.testmod()
+    user_input = input("Enter numbers separated by a comma:\n").strip()
+    unsorted = [int(item) for item in user_input.split(",")]
+    print(gnome_sort(unsorted))

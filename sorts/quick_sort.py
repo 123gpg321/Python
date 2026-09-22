@@ -1,66 +1,56 @@
 """
-This is a pure python implementation of the quick sort algorithm
+A pure Python implementation of the quick sort algorithm
 
 For doctests run following command:
-python -m doctest -v quick_sort.py
-or
 python3 -m doctest -v quick_sort.py
 
 For manual testing run:
-python quick_sort.py
+python3 quick_sort.py
 """
-from __future__ import print_function
-from random import shuffle
+
+from __future__ import annotations
+
+from random import randrange
+from typing import Any, Protocol
 
 
-def sort(collection):
-    shuffle(collection)
-    return quick_sort(collection)
+class Comparable(Protocol):
+    def __lt__(self, other: Any, /) -> bool: ...
 
 
-def quick_sort(collection):
-    """Pure implementation of quick sort algorithm in Python
+def quick_sort[T: Comparable](collection: list[T]) -> list[T]:
+    """A pure Python implementation of quicksort algorithm.
 
-    :param collection: some mutable ordered collection with heterogeneous
-    comparable items inside
-    :return: the same collection ordered by ascending
+    :param collection: a mutable collection of comparable items
+    :return: the same collection ordered in ascending order
 
     Examples:
     >>> quick_sort([0, 5, 3, 2, 2])
     [0, 2, 2, 3, 5]
-
     >>> quick_sort([])
     []
-
-    >>> quick_sort([-2, -5, -45])
-    [-45, -5, -2]
+    >>> quick_sort([-2, 5, 0, -45])
+    [-45, -2, 0, 5]
+    >>> quick_sort(["z", "a", "m", "b"])
+    ['a', 'b', 'm', 'z']
+    >>> quick_sort([3.14, -1.0, 2.71])
+    [-1.0, 2.71, 3.14]
+    >>> quick_sort([0, 5, 3, 2, 2]) == sorted([0, 5, 3, 2, 2])
+    True
+    >>> quick_sort(["z", "a", "m"]) == sorted(["z", "a", "m"])
+    True
     """
-    if len(collection) <= 1:
+    if len(collection) < 2:
         return collection
-    less = []
-    equal = []
-    greater = []
-    pivot = collection[0]
-    for x in collection:
-        if x < pivot:
-            less.append(x)
-        elif x == pivot:
-            equal.append(x)
-        else:
-            greater.append(x)
-    return quick_sort(less) + equal + quick_sort(greater)
+    pivot_index = randrange(len(collection))
+    pivot = collection[pivot_index]
+    lesser = [item for item in collection if item < pivot]
+    equal = [item for item in collection if item == pivot]
+    greater = [item for item in collection if item > pivot]
+    return [*quick_sort(lesser), *equal, *quick_sort(greater)]
 
 
-if __name__ == '__main__':
-    import sys
-
-    # For python 2.x and 3.x compatibility: 3.x has not raw_input builtin
-    # otherwise 2.x's input builtin function is too "smart"
-    if sys.version_info.major < 3:
-        input_function = raw_input
-    else:
-        input_function = input
-
-    user_input = input_function('Enter numbers separated by a comma:\n')
-    unsorted = [int(item) for item in user_input.split(',')]
-    print(sort(unsorted))
+if __name__ == "__main__":
+    user_input = input("Enter numbers separated by a comma:\n").strip()
+    unsorted = [int(item) for item in user_input.split(",")]
+    print(quick_sort(unsorted))
